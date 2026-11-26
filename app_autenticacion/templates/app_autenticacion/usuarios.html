@@ -1,0 +1,86 @@
+{% extends 'app_autenticacion/base.html' %}
+
+{% block titulo %}Usuarios{% endblock %}
+
+{% block contenido %}
+{% include 'app_autenticacion/_navbar.html' %}
+
+<div class="container py-5 aparecer">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+        <div>
+            <h2 class="fw-bold mb-0">Usuarios registrados</h2>
+            <p class="text-muted mb-0">
+                <span id="contador">{{ usuarios|length }}</span> de {{ usuarios|length }} usuarios
+            </p>
+        </div>
+        <input type="search" id="buscador" class="form-control buscador"
+               placeholder="Buscar usuario o correo...">
+    </div>
+
+    <div class="card border-0 shadow-sm tarjeta-tabla">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Correo</th>
+                        <th>Rol</th>
+                        <th>Estado</th>
+                        <th>Último acceso</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla">
+                    {% for u in usuarios %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="avatar">{{ u.username|first|upper }}</span>
+                                <strong>{{ u.username }}</strong>
+                            </div>
+                        </td>
+                        <td>{{ u.email|default:"—" }}</td>
+                        <td>
+                            {% if u.is_superuser %}
+                                <span class="badge bg-danger">Superusuario</span>
+                            {% elif u.is_staff %}
+                                <span class="badge bg-warning text-dark">Staff</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Usuario</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if u.is_active %}
+                                <span class="badge bg-success">Activo</span>
+                            {% else %}
+                                <span class="badge bg-dark">Inactivo</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-muted">{{ u.last_login|date:"d/m/Y H:i"|default:"Nunca" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <p id="vacio" class="text-center text-muted py-4 mb-0 d-none">No se encontró ningún usuario 😕</p>
+    </div>
+</div>
+
+<script>
+    const buscador = document.getElementById('buscador');
+    const filas = document.querySelectorAll('#tabla tr');
+    const contador = document.getElementById('contador');
+    const vacio = document.getElementById('vacio');
+
+    buscador.addEventListener('input', () => {
+        const texto = buscador.value.toLowerCase();
+        let visibles = 0;
+        filas.forEach(fila => {
+            const coincide = fila.textContent.toLowerCase().includes(texto);
+            fila.classList.toggle('d-none', !coincide);
+            if (coincide) visibles++;
+        });
+        contador.textContent = visibles;
+        vacio.classList.toggle('d-none', visibles > 0);
+    });
+</script>
+{% endblock %}

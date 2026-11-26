@@ -23,8 +23,8 @@ def autenticacion(request):
 
 @permission_required('auth.view_user', raise_exception=True)
 def lista_usuarios(request):
-    nombres = [u.username for u in User.objects.all()]
-    return HttpResponse("<h1>Usuarios:</h1>" + "<br>".join(nombres))
+    usuarios = User.objects.all().order_by('username')
+    return render(request, 'app_autenticacion/usuarios.html', {'usuarios': usuarios})
 
 def cerrar_sesion(request):
     logout(request)
@@ -32,4 +32,4 @@ def cerrar_sesion(request):
 
 @login_required
 def inicio(request):
-    return HttpResponse(f"<h1>Bienvenido {request.user.username}</h1>")
+    return render(request, 'app_autenticacion/inicio.html')

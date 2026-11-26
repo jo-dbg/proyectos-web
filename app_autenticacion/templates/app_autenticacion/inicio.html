@@ -1,0 +1,58 @@
+{% extends 'app_autenticacion/base.html' %}
+
+{% block titulo %}Inicio{% endblock %}
+
+{% block contenido %}
+{% include 'app_autenticacion/_navbar.html' %}
+
+<div class="container py-5 aparecer">
+    <div class="p-5 mb-4 rounded-4 bienvenida text-white">
+        <p class="mb-1 opacity-75" id="saludo"></p>
+        <h1 class="display-5 fw-bold">Bienvenido, {{ user.username }} BIENVENIDO</h1>
+        <p class="lead mb-3">Has iniciado sesión correctamente.</p>
+        <span class="badge bg-light text-dark fs-6" id="reloj"></span>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card tarjeta-opcion h-100 border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="icono">👤</div>
+                    <h5 class="card-title">Mi perfil</h5>
+                    <p class="card-text text-muted mb-1">Usuario: {{ user.username }}</p>
+                    <p class="card-text text-muted">
+                        {% if user.is_superuser %}Superusuario{% else %}Usuario normal{% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        {% if perms.auth.view_user %}
+        <div class="col-md-6">
+            <div class="card tarjeta-opcion h-100 border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="icono">👥</div>
+                    <h5 class="card-title">Usuarios</h5>
+                    <p class="card-text text-muted">Ver la lista de usuarios registrados.</p>
+                    <a href="{% url 'lista_usuarios' %}" class="btn btn-primary">Entrar</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    function actualizar() {
+        const ahora = new Date();
+        const h = ahora.getHours();
+        document.getElementById('saludo').textContent =
+            h < 12 ? 'Buenos días' : h < 19 ? 'Buenas tardes' : 'Buenas noches';
+        document.getElementById('reloj').textContent =
+            ahora.toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long' }) +
+            ' · ' + ahora.toLocaleTimeString('es-CO');
+    }
+    actualizar();
+    setInterval(actualizar, 1000);
+</script>
+{% endblock %}
